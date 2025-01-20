@@ -22,4 +22,4 @@ Esse projeto foi construido com o [Next.js](https://nextjs.org/docs) e com a bib
 
 ## Deploy
 
-[Deploy pela versel](#)
+[Deploy pela versel](https://avati-login.vercel.app)
