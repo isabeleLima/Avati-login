@@ -1,101 +1,234 @@
-import Image from "next/image";
+"use client";
+import { useEffect, useState } from "react";
+import Grid from "@mui/material/Grid2";
+import {
+  Box,
+  Button,
+  Container,
+  Divider,
+  Stack,
+  Typography,
+  Link,
+  Snackbar,
+  Alert,
+  SnackbarCloseReason,
+} from "@mui/material";
+import Bg from "../assets/lemon.jpg";
+import { CssTextField } from "./styles/input";
+import { IsEmailValid, IsPasswordValid } from "./service/utils";
+import { login } from "./api/login";
+import { useRouter } from "next/navigation";
+import "@fontsource/roboto/400.css";
 
-export default function Home() {
+export default function Login() {
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState<string>("");
+  const [isClient, setIsClient] = useState(false);
+
+  const handleClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: SnackbarCloseReason
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const router = useRouter();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const handleSubmit = async () => {
+    if (IsEmailValid(email) == false) {
+      setMessage("Email invalido ");
+      setOpen(true);
+      return;
+    }
+    if (IsPasswordValid(password) == false) {
+      setMessage("Senha invalida");
+      setOpen(true);
+      return;
+    }
+    if ((await login(email, password)) == false) {
+      setMessage("Email ou senha incorretos");
+      setOpen(true);
+    }
+
+    if (isClient) {
+      router.push("/home"); // Navega para a página "home"
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <Container fixed>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          backgroundColor: "#f5f5f5",
+        }}
+      >
+        <Grid container>
+          <Grid size={6}>
+            <Box
+              sx={{
+                width: 500,
+                height: 700,
+                padding: 3,
+                backgroundColor: "#006e24",
+                borderEndStartRadius: 30,
+                borderStartStartRadius: 30,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "50%",
+                }}
+              >
+                <Stack
+                  sx={{
+                    width: "80%",
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    component="h1"
+                    align="left"
+                    gutterBottom
+                    sx={{
+                      color: "primary.contrastText",
+                    }}
+                  >
+                    Faça login agora
+                  </Typography>
+                </Stack>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "20%",
+                }}
+              >
+                <Stack
+                  component="form"
+                  spacing={4}
+                  sx={{
+                    width: "80%",
+                    paddingBottom: "5%",
+                  }}
+                >
+                  <CssTextField
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
+                    id="email"
+                    label="email"
+                    type="email"
+                    size="small"
+                  />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+                  <CssTextField
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                    }}
+                    id="password"
+                    label="password"
+                    type="password"
+                    size="small"
+                  />
+
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    disableElevation
+                    onClick={handleSubmit}
+                  >
+                    Login
+                  </Button>
+
+                  <Divider
+                    sx={{
+                      color: "primary.contrastText",
+                    }}
+                  >
+                    Ou
+                  </Divider>
+                </Stack>
+                <Stack direction="row" spacing={1}>
+                  <Typography
+                    variant="subtitle1"
+                    gutterBottom
+                    sx={{
+                      color: "primary.contrastText",
+                    }}
+                  >
+                    Não possui uma conta?{" "}
+                  </Typography>
+                  <Link
+                    href="#"
+                    rel="noopener"
+                    sx={{
+                      textDecoration: "none",
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      gutterBottom
+                      sx={{
+                        color: "primary.contrastText",
+                        "&:hover": {
+                          color: "primary.main",
+                        },
+                      }}
+                    >
+                      Cadastre-se!
+                    </Typography>
+                  </Link>
+                </Stack>
+              </Box>
+            </Box>
+          </Grid>
+          <Grid size={6}>
+            <Box
+              sx={{
+                width: 500,
+                height: 700,
+                backgroundImage: `url(${Bg.src})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                borderStartEndRadius: 30,
+                borderEndEndRadius: 30,
+              }}
+            ></Box>
+          </Grid>
+          <Snackbar
+            open={open}
+            autoHideDuration={3000}
+            onClose={handleClose}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            <Alert severity="error" variant="filled" sx={{ width: "100%" }}>
+              {`${message}`}
+            </Alert>
+          </Snackbar>
+        </Grid>
+      </Box>
+    </Container>
   );
 }
